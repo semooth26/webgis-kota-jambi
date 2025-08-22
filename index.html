@@ -27,6 +27,9 @@
     <!-- Leaflet Geocoder Plugin CSS and JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    
+    <!-- Font Awesome untuk ikon tombol hide/show -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         body, html {
@@ -77,12 +80,20 @@
             height: 100%;
         }
 
-        /* Coordinate Inputs - Top left */
-        .coordinate-inputs {
+        /* Panel untuk input yang dapat disembunyikan */
+        .coordinate-panel {
             position: absolute;
             top: 10px;
             left: 10px;
             z-index: 900;
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .coordinate-panel.hidden {
+            transform: translateX(-100%);
+        }
+
+        .coordinate-inputs {
             background-color: white;
             padding: 10px;
             border-radius: 8px;
@@ -90,8 +101,9 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+            width: 250px;
         }
-        
+
         .form-group {
             display: flex;
             flex-direction: column;
@@ -119,7 +131,7 @@
         .btn-load:hover {
             background-color: #2980b9;
         }
-
+        
         .btn-hide {
             background-color: #e74c3c;
         }
@@ -135,7 +147,33 @@
         .btn-reset:hover {
             background-color: #e67e22;
         }
-        
+
+        /* Tombol Hide/Show yang posisinya independen */
+        .toggle-btn {
+            background-color: #34495e;
+            color: #fff;
+            padding: 8px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            position: absolute; /* Posisikan secara absolut pada map */
+            top: 10px;
+            left: 270px; /* Jarak dari kiri, sama dengan lebar panel + jarak tepi */
+            z-index: 950; /* Pastikan tombol selalu di atas panel */
+            height: 40px;
+            width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            transition: left 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+
+        .toggle-btn.hidden {
+            left: 10px; /* Pindah ke tepi kiri saat menu disembunyikan */
+            transform: rotate(180deg);
+        }
+
         /* Footer */
         .footer {
             background-color: #2980b9;
@@ -211,32 +249,38 @@
     <div class="main-content">
         <div id="map"></div>
         
-        <div class="coordinate-inputs">
-            <!-- Existing Search for Coordinates -->
-            <div class="form-group">
-                <label>Latitude</label>
-                <input class="form-control" name="latitude" id="Latitude" placeholder="-1.6108">
-            </div>
-            <div class="form-group">
-                <label>Longitude</label>
-                <input class="form-control" name="longitude" id="Longitude" placeholder="103.6163">
-            </div>
-            
-            <hr style="border: 0; height: 1px; background: #ccc;">
+        <div class="coordinate-panel" id="coordinate-panel">
+            <div class="coordinate-inputs">
+                <!-- Existing Search for Coordinates -->
+                <div class="form-group">
+                    <label>Latitude</label>
+                    <input class="form-control" name="latitude" id="Latitude" placeholder="-1.6108">
+                </div>
+                <div class="form-group">
+                    <label>Longitude</label>
+                    <input class="form-control" name="longitude" id="Longitude" placeholder="103.6163">
+                </div>
+                
+                <hr style="border: 0; height: 1px; background: #ccc;">
 
-            <!-- New Search for GeoJSON Content -->
-            <div class="form-group">
-                <input class="form-control" name="geojsonSearch" id="geojsonSearch" placeholder="Cari nama kelurahan...">
+                <!-- New Search for GeoJSON Content -->
+                <div class="form-group">
+                    <input class="form-control" name="geojsonSearch" id="geojsonSearch" placeholder="Cari nama kelurahan...">
+                </div>
+                
+                <button id="searchGeojsonBtn" class="btn btn-load" aria-label="Cari Data GeoJSON">Cari Data</button>
+                
+                <hr style="border: 0; height: 1px; background: #ccc;">
+                
+                <button id="loadGeojsonBtn" class="btn btn-load" aria-label="Tampilkan Data GeoJSON">Tampilkan Data</button>
+                <button id="hideGeojsonBtn" class="btn btn-hide" style="display:none;" aria-label="Sembunyikan Data GeoJSON">Sembunyikan Data</button>
+                <button id="zoomToDefaultBtn" class="btn btn-reset" aria-label="Kembali ke tampilan awal">Home</button>
             </div>
-            
-            <button id="searchGeojsonBtn" class="btn btn-load" aria-label="Cari Data GeoJSON">Cari Data</button>
-            
-            <hr style="border: 0; height: 1px; background: #ccc;">
-            
-            <button id="loadGeojsonBtn" class="btn btn-load" aria-label="Tampilkan Data GeoJSON">Tampilkan Data</button>
-            <button id="hideGeojsonBtn" class="btn btn-hide" style="display:none;" aria-label="Sembunyikan Data GeoJSON">Sembunyikan Data</button>
-            <button id="zoomToDefaultBtn" class="btn btn-reset" aria-label="Kembali ke tampilan awal">Home</button>
         </div>
+
+        <!-- Tombol hide/show yang posisinya independen -->
+        <button id="togglePanelBtn" class="toggle-btn" aria-label="Sembunyikan/Tampilkan menu"><i class="fas fa-chevron-left"></i></button>
+
     </div>
 
     <!-- Footer with Logo -->
@@ -435,7 +479,7 @@
 
         zoomToDefaultBtn.addEventListener('click', () => map.setView(defaultCenter, defaultZoom));
         
-        // --- NEW: GeoJSON Search Functionality ---
+        // --- GeoJSON Search Functionality ---
         const geojsonSearchInput = document.getElementById('geojsonSearch');
         const searchGeojsonBtn = document.getElementById('searchGeojsonBtn');
         let lastHighlight = null; // Variable to store the last highlighted layer
@@ -497,6 +541,15 @@
             }
         });
         
+        // --- NEW: Autohide Functionality ---
+        const togglePanelBtn = document.getElementById('togglePanelBtn');
+        const coordinatePanel = document.getElementById('coordinate-panel');
+
+        togglePanelBtn.addEventListener('click', () => {
+            coordinatePanel.classList.toggle('hidden');
+            togglePanelBtn.classList.toggle('hidden');
+        });
+
     </script>
 </body>
 </html>
