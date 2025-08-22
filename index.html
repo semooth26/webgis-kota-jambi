@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="WebGIS interaktif untuk Kota Jambi. Temukan dan jelajahi peta geospasial, data kelurahan, dan lokasi penting di Jambi. Dapatkan informasi akurat tentang area perkotaan Jambi.">
+    <meta name="keywords" content="WebGIS, peta Jambi, Kota Jambi, geospasial, peta interaktif, kelurahan, lokasi, informasi geografis, peta digital">
+    <title>WebGIS KOTA JAMBI - Peta Interaktif Geospasial</title>
+    
+    <!-- Google Analytics: Ganti 'G-XXXXXXXXXX' dengan ID Pelacakan Anda -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C597354KVD"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-C597354KVD');
+    </script>
+
+    <!-- Leaflet CSS and JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+
+    <!-- Leaflet Geocoder Plugin CSS and JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', Arial, sans-serif;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background-image: linear-gradient(to bottom, #3498db, #2980b9);
+            color: #ffffff;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1000;
+        }
+
+        .header .logo {
+            height: 40px;
+            margin-right: 15px;
+        }
+
+        .header .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Coordinate Inputs - Top left */
+        .coordinate-inputs {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 900;
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-control {
+            border: 1px solid #ccc;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        
+        .btn {
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            color: white;
+        }
+
+        .btn-load {
+            background-color: #3498db;
+        }
+
+        .btn-load:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-hide {
+            background-color: #e74c3c;
+        }
+        
+        .btn-hide:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-reset {
+            background-color: #f39c12;
+        }
+
+        .btn-reset:hover {
+            background-color: #e67e22;
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: #2980b9;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1000;
+        }
+
+        .footer a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Custom Message Box */
+        .map-message {
+            position: absolute;
+            top: 70px; /* Position below the header */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            background-color: rgba(44, 62, 80, 0.85);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            font-size: 14px;
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out, top 0.5s ease-in-out;
+        }
+
+        .map-message.error {
+            background-color: rgba(231, 76, 60, 0.85); /* Red for error */
+        }
+
+        .map-message.hidden {
+            opacity: 0;
+            top: 50px;
+            pointer-events: none;
+        }
+
+        /* Geocoder search box styling */
+        .leaflet-control-geocoder-form input {
+            font-family: 'Inter', Arial, sans-serif;
+        }
+
+        .seo-content {
+            display: none; /* Sembunyikan secara visual, tapi tetap dapat dibaca oleh crawler */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header with Gradient -->
+    <header class="header">
+        <img src="https://i.ibb.co.com/0jqDv2fD/Lambang-Kota-Jambi.png" alt="Logo resmi Kota Jambi" class="logo" onerror="this.onerror=null;this.src='https://placehold.co/40x40/ffffff/000000?text=Logo';">
+        <h1 class="title">WebGIS KOTA JAMBI</h1>
+    </header>
+
+    <div class="seo-content">
+        <h2>WebGIS untuk Visualisasi Data Geospasial di Kota Jambi</h2>
+        <p>Aplikasi WebGIS ini menyediakan platform interaktif untuk menjelajahi informasi geografis Kota Jambi. Pengguna dapat mencari lokasi berdasarkan koordinat, nama kelurahan, dan melihat batas-batas wilayah administrasi. Data peta yang digunakan mencakup batas kelurahan, kecamatan, dan informasi terkait lainnya yang dapat diakses melalui file GeoJSON.</p>
+        <p>Fitur utama termasuk: pencarian lokasi, penandaan koordinat, dan menampilkan data wilayah dengan detail properti yang relevan. WebGIS ini dirancang untuk membantu masyarakat, peneliti, dan pihak terkait dalam memahami tata ruang dan geografi Kota Jambi secara lebih baik. Kami menggunakan teknologi Leaflet.js untuk pemetaan dan Geocoder untuk pencarian lokasi yang presisi.</p>
+    </div>
+
+    <div class="main-content">
+        <div id="map"></div>
+        
+        <div class="coordinate-inputs">
+            <!-- Existing Search for Coordinates -->
+            <div class="form-group">
+                <label>Latitude</label>
+                <input class="form-control" name="latitude" id="Latitude" placeholder="-1.6108">
+            </div>
+            <div class="form-group">
+                <label>Longitude</label>
+                <input class="form-control" name="longitude" id="Longitude" placeholder="103.6163">
+            </div>
+            
+            <hr style="border: 0; height: 1px; background: #ccc;">
+
+            <!-- New Search for GeoJSON Content -->
+            <div class="form-group">
+                <input class="form-control" name="geojsonSearch" id="geojsonSearch" placeholder="Cari nama kelurahan...">
+            </div>
+            
+            <button id="searchGeojsonBtn" class="btn btn-load" aria-label="Cari Data GeoJSON">Cari Data</button>
+            
+            <hr style="border: 0; height: 1px; background: #ccc;">
+            
+            <button id="loadGeojsonBtn" class="btn btn-load" aria-label="Tampilkan Data GeoJSON">Tampilkan Data</button>
+            <button id="hideGeojsonBtn" class="btn btn-hide" style="display:none;" aria-label="Sembunyikan Data GeoJSON">Sembunyikan Data</button>
+            <button id="zoomToDefaultBtn" class="btn btn-reset" aria-label="Kembali ke tampilan awal">Home</button>
+        </div>
+    </div>
+
+    <!-- Footer with Logo -->
+    <footer class="footer">
+        <div class="copyright">
+            Copyright © 2025 
+            <img src="https://i.ibb.co.com/Csv1mLY5/Helkun-logo-trans.png" alt="Logo Helkun Corp." style="height: 20px; vertical-align: middle; margin-left: 5px;" onerror="this.onerror=null;this.src='https://placehold.co/60x20/ffffff/000000?text=Logo';">
+        </div>
+    </footer>
+
+    <script>
+        // --- Custom Map Message Function ---
+        function showMapMessage(message, type = 'info', duration = 3000) {
+            const existingMessage = document.querySelector('.map-message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+
+            const messageContainer = document.createElement('div');
+            messageContainer.className = `map-message ${type}`;
+            messageContainer.textContent = message;
+            
+            document.body.appendChild(messageContainer);
+
+            setTimeout(() => {
+                messageContainer.classList.add('hidden');
+                setTimeout(() => {
+                    messageContainer.remove();
+                }, 500);
+            }, duration);
+        }
+
+        // --- Map Initialization ---
+
+        // Define the base layers
+        var peta1 = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            attribution: '© Google Maps',
+            maxZoom: 20,
+        });
+
+        var peta2 = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '© Google Maps'
+        });
+
+        var peta3 = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+
+        var peta4 = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                '<a href="https://carto.com/attributions">CARTO</a>'
+        });
+
+        var peta5 = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: 'Map data © <a href="https://www.google.com/maps">Google Maps</a>'
+        });
+
+        var peta6 = L.tileLayer.wms('https://petadasar.atrbpn.go.id/main/wms/{x}/{y}/{z}', {
+            maxZoom: 20,
+            layers: 'ATRBPN.Citra_Nasional',
+            format: 'image/jpeg',
+            version: '1.1.1',
+            transparent: false,
+            attribution: 'Peta Dasar ATRBPN'
+        });
+
+        // Define default view coordinates and zoom
+        const defaultCenter = [-1.6108583427442669, 103.6163445212305];
+        const defaultZoom = 13;
+
+        // Initialize the map
+        const map = L.map('map', {
+            center: defaultCenter,
+            zoom: defaultZoom,
+            layers: [peta1],
+            zoomControl: false // Menonaktifkan kontrol zoom bawaan
+        });
+
+        // Tambahkan kontrol zoom baru di posisi kiri bawah
+        L.control.zoom({
+            position: 'bottomleft'
+        }).addTo(map);
+
+        // --- Marker and Coordinate Handling ---
+        var latInput = document.getElementById("Latitude");
+        var lngInput = document.getElementById("Longitude");
+        var marker = new L.marker(defaultCenter, { draggable: 'true' }).addTo(map);
+
+        marker.on('dragend', function (e) {
+            var position = marker.getLatLng();
+            latInput.value = position.lat;
+            lngInput.value = position.lng;
+        });
+
+        map.on("click", function(e) {
+            marker.setLatLng(e.latlng);
+            latInput.value = e.latlng.lat;
+            lngInput.value = e.latlng.lng;
+        });
+
+        // --- Geocoder Search Control (for general locations) ---
+        var geocoder = L.Control.geocoder({
+            defaultMarkGeocode: false, // We use our own marker
+            placeholder: 'Cari lokasi...',
+            errorMessage: 'Lokasi tidak ditemukan.',
+            geocoder: new L.Control.Geocoder.Nominatim({
+                geocodingQueryParams: {
+                    countrycodes: 'id', // Prioritize results in Indonesia
+                    viewbox: '103.50,-1.75,103.75,-1.50', // Bounding box for Jambi City
+                    bounded: 1
+                }
+            })
+        })
+        .on('markgeocode', function(e) {
+            var center = e.geocode.center;
+            map.setView(center, 17);
+            marker.setLatLng(center);
+            latInput.value = center.lat;
+            lngInput.value = center.lat;
+        })
+        .addTo(map);
+
+        // --- Layer Control ---
+        const baseLayers = {
+            'Google Maps': peta1,
+            'Google Satelite': peta2,
+            'Open Street Map': peta3,
+            'CARTO': peta4,
+            'Google Hybrid': peta5,
+            'ATRBPN': peta6,
+        };
+        L.control.layers(baseLayers).addTo(map);
+        map.attributionControl.setPrefix(false);
+
+        // --- GeoJSON Functionality ---
+        var geojsonUrl = "https://raw.githubusercontent.com/semooth26/admin-kota-madya-jambi/refs/heads/main/Kota%20Madya%20Jambi.geojson";
+        var loadGeojsonBtn = document.getElementById("loadGeojsonBtn");
+        var hideGeojsonBtn = document.getElementById("hideGeojsonBtn");
+        var zoomToDefaultBtn = document.getElementById("zoomToDefaultBtn");
+        var geojsonLayer = null;
+
+        loadGeojsonBtn.addEventListener('click', function() {
+            if (geojsonLayer) {
+                map.removeLayer(geojsonLayer);
+            }
+            
+            fetch(geojsonUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error('Gagal memuat file GeoJSON.');
+                    return response.json();
+                })
+                .then(data => {
+                    geojsonLayer = L.geoJSON(data, {
+                        style: feature => ({
+                            fillColor: 'transparent', weight: 2, opacity: 1, color: '#3498db', dashArray: '3', fillOpacity: 0.7
+                        }),
+                        onEachFeature: (feature, layer) => {
+                            layer.on({
+                                mouseover: e => layer.setStyle({ weight: 5, color: '#666', dashArray: '' }),
+                                mouseout: e => geojsonLayer.resetStyle(layer),
+                                click: e => {
+                                    let content = "<b>Informasi Properti:</b><br>";
+                                    if (feature.properties) {
+                                        for (let key in feature.properties) {
+                                            content += `<b>${key}</b>: ${feature.properties[key]}<br>`;
+                                        }
+                                    } else {
+                                        content = "Tidak ada properti.";
+                                    }
+                                    L.popup().setLatLng(e.latlng).setContent(content).openOn(map);
+                                }
+                            });
+                        }
+                    }).addTo(map);
+                    showMapMessage("Data berhasil dimuat! Klik pada area untuk melihat info.", 'info');
+                    hideGeojsonBtn.style.display = 'block';
+                })
+                .catch(error => {
+                    showMapMessage("Terjadi kesalahan: " + error.message, 'error');
+                    console.error('Error loading GeoJSON:', error);
+                });
+        });
+
+        hideGeojsonBtn.addEventListener('click', function() {
+            if (geojsonLayer) {
+                map.removeLayer(geojsonLayer);
+                geojsonLayer = null;
+                hideGeojsonBtn.style.display = 'none';
+            }
+        });
+
+        zoomToDefaultBtn.addEventListener('click', () => map.setView(defaultCenter, defaultZoom));
+        
+        // --- NEW: GeoJSON Search Functionality ---
+        const geojsonSearchInput = document.getElementById('geojsonSearch');
+        const searchGeojsonBtn = document.getElementById('searchGeojsonBtn');
+        let lastHighlight = null; // Variable to store the last highlighted layer
+
+        searchGeojsonBtn.addEventListener('click', () => {
+            if (!geojsonLayer) {
+                showMapMessage('Mohon tampilkan data terlebih dahulu.', 'error');
+                return;
+            }
+
+            const searchTerm = geojsonSearchInput.value.toLowerCase().trim();
+            if (searchTerm === '') {
+                showMapMessage('Mohon masukkan kata kunci pencarian.', 'error');
+                return;
+            }
+
+            let found = false;
+            // Reset the style of the last highlighted feature, if any
+            if (lastHighlight) {
+                geojsonLayer.resetStyle(lastHighlight);
+                lastHighlight = null;
+            }
+
+            geojsonLayer.eachLayer(layer => {
+                const properties = layer.feature.properties;
+                // Check if any property value contains the search term
+                for (const key in properties) {
+                    if (typeof properties[key] === 'string' && properties[key].toLowerCase().includes(searchTerm)) {
+                        found = true;
+                        // Zoom and center the map on the found feature
+                        map.fitBounds(layer.getBounds());
+                        
+                        // Highlight the found feature
+                        layer.setStyle({
+                            weight: 5,
+                            color: '#e74c3c',
+                            dashArray: '',
+                            fillOpacity: 0.9
+                        });
+                        lastHighlight = layer; // Store the reference to reset later
+
+                        // Create popup content
+                        let content = "<b>Informasi Properti:</b><br>";
+                        for (let prop in properties) {
+                            content += `<b>${prop}</b>: ${properties[prop]}<br>`;
+                        }
+                        
+                        // Open a popup for the found feature
+                        layer.bindPopup(content).openPopup();
+
+                        showMapMessage(`Data "${searchTerm}" berhasil ditemukan!`, 'info');
+                        return; // Exit the loop after the first match
+                    }
+                }
+            });
+
+            if (!found) {
+                showMapMessage(`Data "${searchTerm}" tidak ditemukan.`, 'error');
+            }
+        });
+        
+    </script>
+</body>
+</html>
