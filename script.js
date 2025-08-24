@@ -127,7 +127,7 @@ L.control.layers(baseLayers).addTo(map);
 map.attributionControl.setPrefix(false);
 
 // --- GeoJSON Functionality ---
-var geojsonUrl = "https://raw.githubusercontent.com/giskotajambi/webgis-kota-jambi/refs/heads/main/Admin_Kota_Jambi_fix.geojson";
+var geojsonUrl = "https://raw.githubusercontent.com/semooth26/webgis-kota-jambi/refs/heads/main/Admin_Kota_Jambi_fix.geojson";
 var loadGeojsonBtn = document.getElementById("loadGeojsonBtn");
 var hideGeojsonBtn = document.getElementById("hideGeojsonBtn");
 var zoomToDefaultBtn = document.getElementById("zoomToDefaultBtn");
