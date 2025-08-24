@@ -1,0 +1,198 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', Arial, sans-serif;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.header {
+    background-image: linear-gradient(to bottom, #3498db, #2980b9);
+    color: #ffffff;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 1000;
+}
+
+.header .logo {
+    height: 40px;
+    margin-right: 15px;
+}
+
+.header .title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffffff;
+    margin: 0;
+}
+
+/* Main Content */
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+/* Panel untuk input yang dapat disembunyikan */
+.coordinate-panel {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 900;
+    transition: transform 0.3s ease-in-out;
+}
+
+.coordinate-panel.hidden {
+    transform: translateX(-100%);
+}
+
+.coordinate-inputs {
+    background-color: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 250px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-control {
+    border: 1px solid #ccc;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.btn {
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    color: white;
+}
+
+.btn-load {
+    background-color: #3498db;
+}
+
+.btn-load:hover {
+    background-color: #2980b9;
+}
+
+.btn-hide {
+    background-color: #e74c3c;
+}
+
+.btn-hide:hover {
+    background-color: #c0392b;
+}
+
+.btn-reset {
+    background-color: #f39c12;
+}
+
+.btn-reset:hover {
+    background-color: #e67e22;
+}
+
+/* Tombol Hide/Show yang posisinya independen */
+.toggle-btn {
+    background-color: #34495e;
+    color: #fff;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    position: absolute; /* Posisikan secara absolut pada map */
+    top: 10px;
+    left: 270px; /* Jarak dari kiri, sama dengan lebar panel + jarak tepi */
+    z-index: 950; /* Pastikan tombol selalu di atas panel */
+    height: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    transition: left 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.toggle-btn.hidden {
+    left: 10px; /* Pindah ke tepi kiri saat menu disembunyikan */
+    transform: rotate(180deg);
+}
+
+/* Footer */
+.footer {
+    background-color: #2980b9;
+    color: #ffffff;
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 1000;
+}
+
+.footer a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+/* Custom Message Box */
+.map-message {
+    position: absolute;
+    top: 70px; /* Position below the header */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    background-color: rgba(44, 62, 80, 0.85);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    font-size: 14px;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out, top 0.5s ease-in-out;
+}
+
+.map-message.error {
+    background-color: rgba(231, 76, 60, 0.85); /* Red for error */
+}
+
+.map-message.hidden {
+    opacity: 0;
+    top: 50px;
+    pointer-events: none;
+}
+
+/* Geocoder search box styling */
+.leaflet-control-geocoder-form input {
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.seo-content {
+    display: none; /* Sembunyikan secara visual, tapi tetap dapat dibaca oleh crawler */
+}
