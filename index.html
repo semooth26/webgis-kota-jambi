@@ -1,99 +1,10 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="WebGIS interaktif untuk Kota Jambi. Temukan dan jelajahi peta geospasial, data kelurahan, dan lokasi penting di Jambi. Dapatkan informasi akurat tentang area perkotaan Jambi.">
-    <meta name="keywords" content="WebGIS, peta Jambi, Kota Jambi, geospasial, peta interaktif, kelurahan, lokasi, informasi geografis, peta digital">
-    <title>WebGIS KOTA JAMBI - Peta Interaktif Geospasial</title>
-    
-    <!-- Google Analytics: Ganti 'G-XXXXXXXXXX' dengan ID Pelacakan Anda -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-08LRQM8YV8"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-08LRQM8YV8');
-    </script>
-
-    <!-- Leaflet CSS and JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""></script>
-
-    <!-- Leaflet Geocoder Plugin CSS and JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-    
-    <!-- Font Awesome untuk ikon tombol hide/show -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Tautan ke file CSS dan JavaScript terpisah -->
-    <link rel="stylesheet" href="style.css">
+    <meta http-equiv="refresh" content="0; url=https://giskotajambi.github.io/webgis-kota-jambi/" />
+    <title>Redirecting...</title>
 </head>
 <body>
-
-    <!-- Header with Gradient -->
-    <header class="header">
-        <img src="https://i.ibb.co.com/0jqDv2fD/Lambang-Kota-Jambi.png" alt="Logo resmi Kota Jambi" class="logo" onerror="this.onerror=null;this.src='https://placehold.co/40x40/ffffff/000000?text=Logo';">
-        <h1 class="title">WebGIS KOTA JAMBI</h1>
-    </header>
-
-    <div class="seo-content">
-        <h2>WebGIS untuk Visualisasi Data Geospasial di Kota Jambi</h2>
-        <p>Aplikasi WebGIS ini menyediakan platform interaktif untuk menjelajahi informasi geografis Kota Jambi. Pengguna dapat mencari lokasi berdasarkan koordinat, nama kelurahan, dan melihat batas-batas wilayah administrasi. Data peta yang digunakan mencakup batas kelurahan, kecamatan, dan informasi terkait lainnya yang dapat diakses melalui file GeoJSON.</p>
-        <p>Fitur utama termasuk: pencarian lokasi, penandaan koordinat, dan menampilkan data wilayah dengan detail properti yang relevan. WebGIS ini dirancang untuk membantu masyarakat, peneliti, dan pihak terkait dalam memahami tata ruang dan geografi Kota Jambi secara lebih baik. Kami menggunakan teknologi Leaflet.js untuk pemetaan dan Geocoder untuk pencarian lokasi yang presisi.</p>
-    </div>
-
-    <div class="main-content">
-        <div id="map"></div>
-        
-        <div class="coordinate-panel" id="coordinate-panel">
-            <div class="coordinate-inputs">
-                <!-- Existing Search for Coordinates -->
-                <div class="form-group">
-                    <label>Latitude</label>
-                    <input class="form-control" name="latitude" id="Latitude" placeholder="-1.6108">
-                </div>
-                <div class="form-group">
-                    <label>Longitude</label>
-                    <input class="form-control" name="longitude" id="Longitude" placeholder="103.6163">
-                </div>
-                
-                <hr style="border: 0; height: 1px; background: #ccc;">
-
-                <!-- New Search for GeoJSON Content -->
-                <div class="form-group">
-                    <input class="form-control" name="geojsonSearch" id="geojsonSearch" placeholder="Cari nama kelurahan...">
-                </div>
-                
-                <button id="searchGeojsonBtn" class="btn btn-load" aria-label="Cari Data GeoJSON">Cari Data</button>
-                
-                <hr style="border: 0; height: 1px; background: #ccc;">
-                
-                <button id="loadGeojsonBtn" class="btn btn-load" aria-label="Tampilkan Data GeoJSON">Tampilkan Data</button>
-                <button id="hideGeojsonBtn" class="btn btn-hide" style="display:none;" aria-label="Sembunyikan Data GeoJSON">Sembunyikan Data</button>
-                <button id="zoomToDefaultBtn" class="btn btn-reset" aria-label="Kembali ke tampilan awal">Home</button>
-            </div>
-        </div>
-
-        <!-- Tombol hide/show yang posisinya independen -->
-        <button id="togglePanelBtn" class="toggle-btn" aria-label="Sembunyikan/Tampilkan menu"><i class="fas fa-chevron-left"></i></button>
-
-    </div>
-
-    <!-- Footer with Logo -->
-    <footer class="footer">
-        <div class="copyright">
-            Copyright © 2025 
-            <img src="https://i.ibb.co.com/Csv1mLY5/Helkun-logo-trans.png" alt="Logo Helkun Corp." style="height: 20px; vertical-align: middle; margin-left: 5px;" onerror="this.onerror=null;this.src='https://placehold.co/60x20/ffffff/000000?text=Logo';">
-        </div>
-    </footer>
-    
-    <!-- Tautan ke file JavaScript terpisah -->
-    <script src="script.js"></script>
+    <p>Jika Anda tidak dialihkan secara otomatis, silakan klik <a href="https://giskotajambi.github.io/webgis-kota-jambi/">di sini</a>.</p>
 </body>
 </html>
